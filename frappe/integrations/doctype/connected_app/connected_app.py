@@ -9,7 +9,8 @@ from frappe import _
 from frappe.model.document import Document
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
-from requests_oauthlib import OAuth2Session
+from rauth import OAuth2Service
+from frappe.integrations.oauth2_logins import decoder_compat
 
 if frappe.conf.developer_mode:
 	# Disable mandatory TLS in developer mode
@@ -26,10 +27,12 @@ class ConnectedApp(Document):
 		self.redirect_uri = frappe.request.host_url + callback_path + self.callback
 
 	def get_oauth2_session(self):
-		return OAuth2Session(
-			self.client_id,
-			redirect_uri=self.redirect_uri,
-			scope=[scope.scope for scope in self.scopes]
+		return OAuth2Service(
+			client_id=self.client_id,
+			client_secret=self.get_password('client_secret'),
+			access_token_url=self.token_endpoint,
+			authorize_url=self.authorization_endpoint,
+			base_url=self.userinfo_endpoint
 		)
 
 	def get_client_token(self):
@@ -73,7 +76,16 @@ class ConnectedApp(Document):
 		redirect_to = redirect_to or '/desk'
 		user = user or frappe.session.user
 		oauth = self.get_oauth2_session()
-		authorization_url, state = oauth.authorization_url(self.authorization_endpoint)
+		# TODO: Build state with redirect url
+		state = frappe.generate_hash(length=16)
+		params = {
+			'redirect_uri': self.redirect_uri,
+			'response_type': 'code',
+			'state': state,
+			'scope': " ".join([scope.scope for scope in self.scopes])
+		}
+
+		authorization_url = oauth.get_authorize_url(**params)
 
 		try:
 			token = self.get_stored_user_token(user)
@@ -164,11 +176,14 @@ def callback(code=None, state=None):
 
 		client_secret = app.get_password('client_secret')
 		oauth = app.get_oauth2_session()
-		token = oauth.fetch_token(
-			app.token_endpoint,
-			code=code,
-			client_secret=client_secret
-		)
+		data = {
+			'code': code,
+			'grant_type': 'authorization_code',
+			'redirect_uri': app.redirect_uri
+		}
+
+		token = oauth.get_auth_session(data=data, decoder=decoder_compat)
+		token = token.access_token_response.json()
 
 		token_cache.access_token = token.get('access_token')
 		token_cache.refresh_token = token.get('refresh_token')
@@ -176,7 +191,7 @@ def callback(code=None, state=None):
 
 		scopes = token.get('scope')
 		if isinstance(scopes, str):
-			scopes = [scopes]
+			scopes = scopes.split(' ')
 		for scope in scopes:
 			token_cache.append('scopes', {'scope': scope})
 
