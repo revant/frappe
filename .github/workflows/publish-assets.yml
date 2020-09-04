@@ -1,0 +1,16 @@
+name: Publish Assets
+on:
+  push:
+    branches: [assets]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: frappe/bench:latest
+      options: --user frappe
+    steps:
+    - name: bench
+      run: |
+        source /home/frappe/.bashrc
+        export PATH=/home/frappe/.local/bin:$PATH
+        which bench
