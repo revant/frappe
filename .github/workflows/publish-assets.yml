@@ -12,4 +12,4 @@ jobs:
     - name: bench
       run: |
         export PATH=/home/frappe/.local/bin:/home/frappe/.nvm/versions/node/v12.18.2/bin/:$PATH
-        which bench
+        bench --help
