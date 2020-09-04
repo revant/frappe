@@ -11,6 +11,5 @@ jobs:
     steps:
     - name: bench
       run: |
-        source /home/frappe/.bashrc
-        export PATH=/home/frappe/.local/bin:$PATH
+        export PATH=/home/frappe/.local/bin:/home/frappe/.nvm/versions/node/v12.18.2/bin/:$PATH
         which bench
