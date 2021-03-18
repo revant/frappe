@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Property Setter')
 
+
 class TestPropertySetter(unittest.TestCase):
-	pass
+    pass

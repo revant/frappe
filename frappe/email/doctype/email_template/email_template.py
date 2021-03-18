@@ -7,37 +7,38 @@ from frappe.model.document import Document
 from frappe.utils.jinja import validate_template
 from six import string_types
 
+
 class EmailTemplate(Document):
-	def validate(self):
-		if self.use_html:
-			validate_template(self.response_html)
-		else:
-			validate_template(self.response)
+    def validate(self):
+        if self.use_html:
+            validate_template(self.response_html)
+        else:
+            validate_template(self.response)
 
-	def get_formatted_subject(self, doc):
-		return frappe.render_template(self.subject, doc)
+    def get_formatted_subject(self, doc):
+        return frappe.render_template(self.subject, doc)
 
-	def get_formatted_response(self, doc):
-		if self.use_html:
-			return frappe.render_template(self.response_html, doc)
+    def get_formatted_response(self, doc):
+        if self.use_html:
+            return frappe.render_template(self.response_html, doc)
 
-		return frappe.render_template(self.response, doc)
+        return frappe.render_template(self.response, doc)
 
-	def get_formatted_email(self, doc):
-		if isinstance(doc, string_types):
-			doc = json.loads(doc)
+    def get_formatted_email(self, doc):
+        if isinstance(doc, string_types):
+            doc = json.loads(doc)
 
-		return {
-			"subject" : self.get_formatted_subject(doc),
-			"message" : self.get_formatted_response(doc)
-		}
+        return {
+            "subject": self.get_formatted_subject(doc),
+            "message": self.get_formatted_response(doc),
+        }
 
 
 @frappe.whitelist()
 def get_email_template(template_name, doc):
-	'''Returns the processed HTML of a email template with the given doc'''
-	if isinstance(doc, string_types):
-		doc = json.loads(doc)
+    """Returns the processed HTML of a email template with the given doc"""
+    if isinstance(doc, string_types):
+        doc = json.loads(doc)
 
-	email_template = frappe.get_doc("Email Template", template_name)
-	return email_template.get_formatted_email(doc)
+    email_template = frappe.get_doc("Email Template", template_name)
+    return email_template.get_formatted_email(doc)

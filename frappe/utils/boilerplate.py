@@ -8,103 +8,141 @@ from six.moves import input
 import frappe, os, re, git
 from frappe.utils import touch_file, cstr
 
+
 def make_boilerplate(dest, app_name):
-	if not os.path.exists(dest):
-		print("Destination directory does not exist")
-		return
+    if not os.path.exists(dest):
+        print("Destination directory does not exist")
+        return
 
-	# app_name should be in snake_case
-	app_name = frappe.scrub(app_name)
+    # app_name should be in snake_case
+    app_name = frappe.scrub(app_name)
 
-	hooks = frappe._dict()
-	hooks.app_name = app_name
-	app_title = hooks.app_name.replace("_", " ").title()
-	for key in ("App Title (default: {0})".format(app_title),
-		"App Description", "App Publisher", "App Email",
-		"App Icon (default 'octicon octicon-file-directory')",
-		"App Color (default 'grey')",
-		"App License (default 'MIT')"):
-		hook_key = key.split(" (")[0].lower().replace(" ", "_")
-		hook_val = None
-		while not hook_val:
-			hook_val = cstr(input(key + ": "))
+    hooks = frappe._dict()
+    hooks.app_name = app_name
+    app_title = hooks.app_name.replace("_", " ").title()
+    for key in (
+        "App Title (default: {0})".format(app_title),
+        "App Description",
+        "App Publisher",
+        "App Email",
+        "App Icon (default 'octicon octicon-file-directory')",
+        "App Color (default 'grey')",
+        "App License (default 'MIT')",
+    ):
+        hook_key = key.split(" (")[0].lower().replace(" ", "_")
+        hook_val = None
+        while not hook_val:
+            hook_val = cstr(input(key + ": "))
 
-			if not hook_val:
-				defaults = {
-					"app_title": app_title,
-					"app_icon": "octicon octicon-file-directory",
-					"app_color": "grey",
-					"app_license": "MIT"
-				}
-				if hook_key in defaults:
-					hook_val = defaults[hook_key]
+            if not hook_val:
+                defaults = {
+                    "app_title": app_title,
+                    "app_icon": "octicon octicon-file-directory",
+                    "app_color": "grey",
+                    "app_license": "MIT",
+                }
+                if hook_key in defaults:
+                    hook_val = defaults[hook_key]
 
-			if hook_key=="app_name" and hook_val.lower().replace(" ", "_") != hook_val:
-				print("App Name must be all lowercase and without spaces")
-				hook_val = ""
-			elif hook_key=="app_title" and not re.match("^(?![\W])[^\d_\s][\w -]+$", hook_val, re.UNICODE):
-				print("App Title should start with a letter and it can only consist of letters, numbers, spaces and underscores")
-				hook_val = ""
+            if (
+                hook_key == "app_name"
+                and hook_val.lower().replace(" ", "_") != hook_val
+            ):
+                print("App Name must be all lowercase and without spaces")
+                hook_val = ""
+            elif hook_key == "app_title" and not re.match(
+                "^(?![\W])[^\d_\s][\w -]+$", hook_val, re.UNICODE
+            ):
+                print(
+                    "App Title should start with a letter and it can only consist of letters, numbers, spaces and underscores"
+                )
+                hook_val = ""
 
-		hooks[hook_key] = hook_val
+        hooks[hook_key] = hook_val
 
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, frappe.scrub(hooks.app_title)),
-		with_init=True)
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "templates"), with_init=True)
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "www"))
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "templates",
-		"pages"), with_init=True)
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "templates",
-		"includes"))
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "config"), with_init=True)
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "public",
-		"css"))
-	frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "public",
-		"js"))
+    frappe.create_folder(
+        os.path.join(
+            dest, hooks.app_name, hooks.app_name, frappe.scrub(hooks.app_title)
+        ),
+        with_init=True,
+    )
+    frappe.create_folder(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "templates"), with_init=True
+    )
+    frappe.create_folder(os.path.join(dest, hooks.app_name, hooks.app_name, "www"))
+    frappe.create_folder(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "templates", "pages"),
+        with_init=True,
+    )
+    frappe.create_folder(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "templates", "includes")
+    )
+    frappe.create_folder(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "config"), with_init=True
+    )
+    frappe.create_folder(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "public", "css")
+    )
+    frappe.create_folder(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "public", "js")
+    )
 
-	with open(os.path.join(dest, hooks.app_name, hooks.app_name, "__init__.py"), "w") as f:
-		f.write(frappe.as_unicode(init_template))
+    with open(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "__init__.py"), "w"
+    ) as f:
+        f.write(frappe.as_unicode(init_template))
 
-	with open(os.path.join(dest, hooks.app_name, "MANIFEST.in"), "w") as f:
-		f.write(frappe.as_unicode(manifest_template.format(**hooks)))
+    with open(os.path.join(dest, hooks.app_name, "MANIFEST.in"), "w") as f:
+        f.write(frappe.as_unicode(manifest_template.format(**hooks)))
 
-	with open(os.path.join(dest, hooks.app_name, ".gitignore"), "w") as f:
-		f.write(frappe.as_unicode(gitignore_template.format(app_name = hooks.app_name)))
+    with open(os.path.join(dest, hooks.app_name, ".gitignore"), "w") as f:
+        f.write(frappe.as_unicode(gitignore_template.format(app_name=hooks.app_name)))
 
-	with open(os.path.join(dest, hooks.app_name, "setup.py"), "w") as f:
-		f.write(frappe.as_unicode(setup_template.format(**hooks)))
+    with open(os.path.join(dest, hooks.app_name, "setup.py"), "w") as f:
+        f.write(frappe.as_unicode(setup_template.format(**hooks)))
 
-	with open(os.path.join(dest, hooks.app_name, "requirements.txt"), "w") as f:
-		f.write("frappe")
+    with open(os.path.join(dest, hooks.app_name, "requirements.txt"), "w") as f:
+        f.write("frappe")
 
-	with open(os.path.join(dest, hooks.app_name, "README.md"), "w") as f:
-		f.write(frappe.as_unicode("## {0}\n\n{1}\n\n#### License\n\n{2}".format(hooks.app_title,
-			hooks.app_description, hooks.app_license)))
+    with open(os.path.join(dest, hooks.app_name, "README.md"), "w") as f:
+        f.write(
+            frappe.as_unicode(
+                "## {0}\n\n{1}\n\n#### License\n\n{2}".format(
+                    hooks.app_title, hooks.app_description, hooks.app_license
+                )
+            )
+        )
 
-	with open(os.path.join(dest, hooks.app_name, "license.txt"), "w") as f:
-		f.write(frappe.as_unicode("License: " + hooks.app_license))
+    with open(os.path.join(dest, hooks.app_name, "license.txt"), "w") as f:
+        f.write(frappe.as_unicode("License: " + hooks.app_license))
 
-	with open(os.path.join(dest, hooks.app_name, hooks.app_name, "modules.txt"), "w") as f:
-		f.write(frappe.as_unicode(hooks.app_title))
+    with open(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "modules.txt"), "w"
+    ) as f:
+        f.write(frappe.as_unicode(hooks.app_title))
 
-	with open(os.path.join(dest, hooks.app_name, hooks.app_name, "hooks.py"), "w") as f:
-		f.write(frappe.as_unicode(hooks_template.format(**hooks)))
+    with open(os.path.join(dest, hooks.app_name, hooks.app_name, "hooks.py"), "w") as f:
+        f.write(frappe.as_unicode(hooks_template.format(**hooks)))
 
-	touch_file(os.path.join(dest, hooks.app_name, hooks.app_name, "patches.txt"))
+    touch_file(os.path.join(dest, hooks.app_name, hooks.app_name, "patches.txt"))
 
-	with open(os.path.join(dest, hooks.app_name, hooks.app_name, "config", "desktop.py"), "w") as f:
-		f.write(frappe.as_unicode(desktop_template.format(**hooks)))
+    with open(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "config", "desktop.py"), "w"
+    ) as f:
+        f.write(frappe.as_unicode(desktop_template.format(**hooks)))
 
-	with open(os.path.join(dest, hooks.app_name, hooks.app_name, "config", "docs.py"), "w") as f:
-		f.write(frappe.as_unicode(docs_template.format(**hooks)))
+    with open(
+        os.path.join(dest, hooks.app_name, hooks.app_name, "config", "docs.py"), "w"
+    ) as f:
+        f.write(frappe.as_unicode(docs_template.format(**hooks)))
 
-	# initialize git repository
-	app_directory = os.path.join(dest, hooks.app_name)
-	app_repo = git.Repo.init(app_directory)
-	app_repo.git.add(A=True)
-	app_repo.index.commit("feat: Initialize App")
+    # initialize git repository
+    app_directory = os.path.join(dest, hooks.app_name)
+    app_repo = git.Repo.init(app_directory)
+    app_repo.git.add(A=True)
+    app_repo.index.commit("feat: Initialize App")
 
-	print("'{app}' created at {path}".format(app=app_name, path=app_directory))
+    print("'{app}' created at {path}".format(app=app_name, path=app_directory))
 
 
 manifest_template = """include MANIFEST.in

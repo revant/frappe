@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Kanban Board')
 
+
 class TestKanbanBoard(unittest.TestCase):
-	pass
+    pass

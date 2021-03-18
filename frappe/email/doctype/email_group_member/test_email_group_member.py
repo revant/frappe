@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Email Group Member')
 
+
 class TestEmailGroupMember(unittest.TestCase):
-	pass
+    pass

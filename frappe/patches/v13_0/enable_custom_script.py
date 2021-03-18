@@ -4,9 +4,12 @@
 from __future__ import unicode_literals
 import frappe
 
-def execute():
-	"""Enable all the existing Client script"""
 
-	frappe.db.sql("""
+def execute():
+    """Enable all the existing Client script"""
+
+    frappe.db.sql(
+        """
 		UPDATE `tabClient Script` SET enabled=1
-	""")
+	"""
+    )

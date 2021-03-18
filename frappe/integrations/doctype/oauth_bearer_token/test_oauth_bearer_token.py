@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('OAuth Bearer Token')
 
+
 class TestOAuthBearerToken(unittest.TestCase):
-	pass
+    pass

@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Error Log')
 
+
 class TestErrorLog(unittest.TestCase):
-	pass
+    pass

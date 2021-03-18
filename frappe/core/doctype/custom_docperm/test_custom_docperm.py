@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Custom DocPerm')
 
+
 class TestCustomDocPerm(unittest.TestCase):
-	pass
+    pass

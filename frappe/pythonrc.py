@@ -7,4 +7,5 @@ from __future__ import unicode_literals
 
 import os
 import frappe
+
 frappe.connect(site=os.environ.get("site"))

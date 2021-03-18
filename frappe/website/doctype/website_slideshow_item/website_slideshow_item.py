@@ -8,5 +8,6 @@ import frappe
 
 from frappe.model.document import Document
 
+
 class WebsiteSlideshowItem(Document):
-	pass
+    pass

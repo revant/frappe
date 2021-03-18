@@ -6,15 +6,18 @@ from __future__ import unicode_literals
 import frappe
 import unittest
 
+
 class TestSystemConsole(unittest.TestCase):
-	def test_system_console(self):
-		system_console = frappe.get_doc('System Console')
-		system_console.console = 'log("hello")'
-		system_console.run()
+    def test_system_console(self):
+        system_console = frappe.get_doc("System Console")
+        system_console.console = 'log("hello")'
+        system_console.run()
 
-		self.assertEqual(system_console.output, 'hello')
+        self.assertEqual(system_console.output, "hello")
 
-		system_console.console = 'log(frappe.db.get_value("DocType", "DocType", "module"))'
-		system_console.run()
+        system_console.console = (
+            'log(frappe.db.get_value("DocType", "DocType", "module"))'
+        )
+        system_console.run()
 
-		self.assertEqual(system_console.output, 'Core')
+        self.assertEqual(system_console.output, "Core")

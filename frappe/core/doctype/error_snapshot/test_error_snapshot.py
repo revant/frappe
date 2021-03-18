@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Error Snapshot')
 
+
 class TestErrorSnapshot(unittest.TestCase):
-	pass
+    pass

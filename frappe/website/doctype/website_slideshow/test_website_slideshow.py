@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Website Slideshow')
 
+
 class TestWebsiteSlideshow(unittest.TestCase):
-	pass
+    pass

@@ -6,5 +6,6 @@ import frappe
 
 from frappe.model.document import Document
 
+
 class WorkflowDocumentState(Document):
-	pass
+    pass

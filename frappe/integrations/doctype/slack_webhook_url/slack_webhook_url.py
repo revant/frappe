@@ -12,40 +12,40 @@ import json
 
 
 error_messages = {
-	400: "400: Invalid Payload or User not found",
-	403: "403: Action Prohibited",
-	404: "404: Channel not found",
-	410: "410: The Channel is Archived",
-	500: "500: Rollup Error, Slack seems to be down"
+    400: "400: Invalid Payload or User not found",
+    403: "403: Action Prohibited",
+    404: "404: Channel not found",
+    410: "410: The Channel is Archived",
+    500: "500: Rollup Error, Slack seems to be down",
 }
 
 
 class SlackWebhookURL(Document):
-	pass
+    pass
 
 
 def send_slack_message(webhook_url, message, reference_doctype, reference_name):
-	slack_url = frappe.db.get_value("Slack Webhook URL", webhook_url, "webhook_url")
-	doc_url = get_url_to_form(reference_doctype, reference_name)
-	attachments = [
-		{
-			"fallback": _("See the document at {0}").format(doc_url),
-			"actions": [
-				{
-					"type": "button",
-					"text": _("Go to the document"),
-					"url": doc_url,
-					"style": "primary"
-				}
-			]
-		}
-	]
-	data = {"text": message, "attachments": attachments}
-	r = requests.post(slack_url, data=json.dumps(data))
+    slack_url = frappe.db.get_value("Slack Webhook URL", webhook_url, "webhook_url")
+    doc_url = get_url_to_form(reference_doctype, reference_name)
+    attachments = [
+        {
+            "fallback": _("See the document at {0}").format(doc_url),
+            "actions": [
+                {
+                    "type": "button",
+                    "text": _("Go to the document"),
+                    "url": doc_url,
+                    "style": "primary",
+                }
+            ],
+        }
+    ]
+    data = {"text": message, "attachments": attachments}
+    r = requests.post(slack_url, data=json.dumps(data))
 
-	if not r.ok:
-		message = error_messages.get(r.status_code, r.status_code)
-		frappe.log_error(message, _('Slack Webhook Error'))
-		return 'error'
+    if not r.ok:
+        message = error_messages.get(r.status_code, r.status_code)
+        frappe.log_error(message, _("Slack Webhook Error"))
+        return "error"
 
-	return 'success'
+    return "success"

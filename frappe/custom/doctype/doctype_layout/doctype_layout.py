@@ -8,7 +8,8 @@ from frappe.model.document import Document
 
 from frappe.desk.utils import slug
 
+
 class DocTypeLayout(Document):
-	def validate(self):
-		if not self.route:
-			self.route = slug(self.name)
+    def validate(self):
+        if not self.route:
+            self.route = slug(self.name)

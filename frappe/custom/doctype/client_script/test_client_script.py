@@ -8,5 +8,6 @@ import unittest
 
 # test_records = frappe.get_test_records('Client Script')
 
+
 class TestClientScript(unittest.TestCase):
-	pass
+    pass

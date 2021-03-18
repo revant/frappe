@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 
+
 class CustomDocPerm(Document):
-	def on_update(self):
-		frappe.clear_cache(doctype = self.parent)
+    def on_update(self):
+        frappe.clear_cache(doctype=self.parent)

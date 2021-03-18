@@ -11,14 +11,17 @@ def get_output(command, shell=True):
     command = shlex.split(command)
     return subprocess.check_output(command, shell=shell, encoding="utf8").strip()
 
+
 def is_py(file):
     return file.endswith("py")
+
 
 def is_js(file):
     return file.endswith("js")
 
+
 def is_docs(file):
-    regex = re.compile('\.(md|png|jpg|jpeg)$|^.github|LICENSE')
+    regex = re.compile("\.(md|png|jpg|jpeg)$|^.github|LICENSE")
     return bool(regex.search(file))
 
 
@@ -26,12 +29,14 @@ if __name__ == "__main__":
     build_type = os.environ.get("TYPE")
     before = os.environ.get("BEFORE")
     after = os.environ.get("AFTER")
-    commit_range = before + '...' + after
+    commit_range = before + "..." + after
     print("Build Type: {}".format(build_type))
     print("Commit Range: {}".format(commit_range))
 
     try:
-        files_changed = get_output("git diff --name-only {}".format(commit_range), shell=False)
+        files_changed = get_output(
+            "git diff --name-only {}".format(commit_range), shell=False
+        )
     except Exception:
         sys.exit(2)
 
