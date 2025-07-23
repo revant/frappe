@@ -90,5 +90,8 @@
   },
   "overrides": {
     "stylus": "github:stylus/stylus#0.64.0"
+  },
+  "resolutions": {
+    "stylus": "github:stylus/stylus#0.64.0"
   }
 }
